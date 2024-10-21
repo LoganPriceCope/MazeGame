@@ -1,10 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
+
+    public GameObject runFrame;
+    public GameObject winFrame;
+
     public Camera playerCamera;
     public float walkSpeed = 6f;
     public float runSpeed = 12f;
@@ -20,6 +26,8 @@ public class PlayerMovement : MonoBehaviour
 
     public bool carryingWinningPart;
 
+    public LockPlayerCamera lockPlayerCamera;
+
     public GameObject box;
 
 
@@ -29,8 +37,8 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         characterController = GetComponent<CharacterController>();
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     void Update()
@@ -80,9 +88,23 @@ public class PlayerMovement : MonoBehaviour
         if (other.transform.tag == "WinPart")
         {
             other.enabled = false;
+            
             carryingWinningPart = true;
             Destroy(box);
             Debug.Log("Carrying Winning Part.");
+        }
+        else if(other.transform.tag == "EndPart")
+        {
+            if(carryingWinningPart == true)
+            {
+                carryingWinningPart = false;
+                winFrame.SetActive(true);
+                runFrame.SetActive(false);
+                if (Input.GetKey("E"))
+                {
+                    SceneManager.LoadScene("SampleScene");
+                }
+            }
         }
     }
 
@@ -90,7 +112,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (carryingWinningPart)
         {
-
+            runFrame.SetActive(true);
+            walkSpeed = +10;
+            runSpeed = +15;
         }
     }
 }

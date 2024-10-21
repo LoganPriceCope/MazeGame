@@ -13,6 +13,10 @@ namespace Player
     public class PlayerScript : MonoBehaviour
     {
 
+        public PlayerMovement playerMovement;
+
+        public bool runMode = false;
+
         // EEE
         public Transform[] points;
         public NavMeshAgent nav;
@@ -22,7 +26,7 @@ namespace Player
 
         public RaycastHit hit;
 
-        public Canvas canvas;
+        public GameObject deathFrame;
         public GameObject player;
         //EEE
 
@@ -52,14 +56,19 @@ namespace Player
 
             // initialise the statemachine with the default state
             sm.Init(partolState);
+            
         }
 
         // Update is called once per frame
         public void Update()
         {
+            if (playerMovement.carryingWinningPart)
+            {
+                sightRange = 1000f;
+
+            }
             playerInSightRange = Physics.CheckSphere(transform.position, sightRange, playerLayer);
             playerInKillRange = Physics.CheckSphere(transform.position, killRange, playerLayer);
-
             sm.CurrentState.LogicUpdate();
 
             //output debug info to the canvas
@@ -69,6 +78,8 @@ namespace Player
             //UIscript.ui.DrawText(s);
 
             //UIscript.ui.DrawText("Press I for idle / R for run");
+
+
 
         }
 
@@ -114,7 +125,7 @@ namespace Player
             if (playerInKillRange)
             {
                 Debug.Log("Enters");
-                canvas.enabled = true;
+                deathFrame.SetActive(true);
                 Invoke("Restart", 5f);
             }
         }
@@ -132,5 +143,4 @@ namespace Player
             Gizmos.DrawSphere(transform.position, killRange);
         }
     }
-
 }
